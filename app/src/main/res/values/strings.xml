@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Lab02c2016</string>
+
+    <string name="Titulo">Pedite La Cena!!!</string>
+    <string name="btnSeleccionHorario">Seleccione el horario</string>
+
+
+
+    <!--String de Botones-->
+    <string name="btnDelivery">DELIVERY</string>
+    <string name="btnAgregar">AGREGAR</string>
+    <string name="btnConfirmar">CONFIRMAR PEDIDO</string>
+    <string name="btnReiniciar">REINICIAR</string>
+
+    
+
+
+</resources>
