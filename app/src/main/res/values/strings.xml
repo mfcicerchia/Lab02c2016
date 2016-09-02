@@ -1,9 +1,14 @@
 <resources>
     <string name="app_name">Lab02c2016</string>
 
+    <!-- String de Etiquetas -->
     <string name="Titulo">Pedite La Cena!!!</string>
-    <string name="btnSeleccionHorario">Seleccione el horario</string>
-
+    <string name="tvSeleccionHorario">Seleccione el horario</string>
+    <string name="tvNotificarReserva">Notificar Reserva 1 hora antes</string>
+    
+    <string name="rbtPlato"> Plato </string>
+    <string name="rbtPostre"> Postre </string>
+    <string name="rbtBebida"> Bebida </string>
 
 
     <!--String de Botones-->
@@ -12,7 +17,11 @@
     <string name="btnConfirmar">CONFIRMAR PEDIDO</string>
     <string name="btnReiniciar">REINICIAR</string>
 
-    
+
+
+
+
+
 
 
 </resources>
