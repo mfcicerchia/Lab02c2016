@@ -1,37 +1,275 @@
 package com.pharmacy.martin.lab02c2016;
 
+import android.annotation.SuppressLint;
 import android.icu.text.DecimalFormat;
+import android.nfc.Tag;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.prefs.Preferences;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener,
+        RadioGroup.OnCheckedChangeListener,
+        AdapterView.OnItemClickListener {
 
     private ListView listaMenu;
-    private ToggleButton btnDeliery;
+    private ToggleButton btnDelivery;
+    private RadioGroup rdBtnGrupo;
+    private RadioButton rdBtnPlato, rdBtnPostre, rdBtnBebida;
     private Button btnAgregar, btnReiniciar, btnConfirmar;
     private Spinner spnrHorario;
     private Switch swNotificacion;
+    private TextView tvDatosPedido;
+    private double costo = 0;
+    private boolean pedidoConfirmado = false;
+
+    ArrayList<ElementoMenu> elementosPedidos = new ArrayList<ElementoMenu>();
+    ArrayAdapter<ElementoMenu> adaptador;
 
 
     /**
-     * Variables De instancia
+     * Listas De instancia
      */
     private ElementoMenu[] listaBebidas;
     private ElementoMenu[] listaPlatos;
-    private ElementoMenu[] listaPostre;
+    private ElementoMenu[] listaPostres;
+
+    /**
+     * definicion de Decimal format
+     */
+
+
+    private String TAG;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.iniciarListas();
+
+        btnDelivery = (ToggleButton) findViewById(R.id.btnDelivery);
+        btnDelivery.setOnCheckedChangeListener(this);
+
+        rdBtnGrupo = (RadioGroup) findViewById(R.id.radGrp);
+        rdBtnGrupo.setOnCheckedChangeListener(this);
+
+        listaMenu = (ListView) findViewById(R.id.lvCarta);
+        listaMenu.setChoiceMode(listaMenu.CHOICE_MODE_MULTIPLE);
+        listaMenu.setOnItemClickListener(this);
+
+        tvDatosPedido = (TextView) findViewById(R.id.tvDatosPedido);
+        tvDatosPedido.setMovementMethod(new ScrollingMovementMethod());
+
+
+        /**Asignacion del manejador de evento a cada boton (otra forma)*/
+        btnAgregar = (Button) findViewById(R.id.btnAgregar);
+        btnAgregar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int count = listaMenu.getCount();
+                SparseBooleanArray viewItems = listaMenu.getCheckedItemPositions();
+                if (pedidoConfirmado == false) {
+                    for (int i = 0; i < count; i++) {
+                        if (viewItems.get(i)) {
+                            ElementoMenu item = (ElementoMenu) listaMenu.getItemAtPosition(i);
+                            Toast.makeText(getApplicationContext(), item + "..." + item.getPrecio(), Toast.LENGTH_SHORT).show();
+
+                            elementosPedidos.add(item);
+                            /**Controlar la cantidad de cada item*/
+                        /* if (!elementosPedidos.contains(item)) {
+                            elementosPedidos.add(item);
+                        }else{
+
+                        }*/
+                        }
+                    }
+
+                    if (elementosPedidos != null) {
+                        tvDatosPedido.setText("");
+                        for (ElementoMenu e : elementosPedidos) {
+                            tvDatosPedido.append(e + "\n");
+                        }
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Debe seleccionar elementos del Menu", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "No puede agregar productos al pedido porque fue confirmado", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+
+        btnConfirmar = (Button) findViewById(R.id.btnConfirmar);
+        btnConfirmar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double costo = calcularCostoPedido(elementosPedidos);
+                if (pedidoConfirmado != true) {
+                    if (costo != 0) {
+                        tvDatosPedido.append("El costro del pedido es: " + costo);
+                        Toast.makeText(getApplicationContext(), "El costo del pedidos es: " + costo, Toast.LENGTH_LONG).show();
+                        pedidoConfirmado = true;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Debe seleccionar algun producto del Menu", Toast.LENGTH_LONG).show();
+                    }
+                }else{
+                    Toast.makeText(getApplicationContext(), "Pedido ya confirmado con Exito", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+
+        btnReiniciar = (Button) findViewById(R.id.btnReiniciar);
+        btnReiniciar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tvDatosPedido.setText("Datos de Pedido");
+                elementosPedidos.clear();
+                ArrayList<ElementoMenu> elementosPedidos = new ArrayList<ElementoMenu>();
+                tvDatosPedido.setText("Datos de Pedido");
+                pedidoConfirmado=false;
+            }
+        });
+
+
+    }
+
+
+    /**
+     * Manejadores de Eventos
+     */
+    /*Manejador de eventos del ToggleButton*/
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+
+        } else {
+
+        }
+    }
+
+    /*Manejador de eventos del RadioGroupButton*/
+    @Override
+    public void onCheckedChanged(RadioGroup group, int id) {
+        switch (id) {
+            case -1:
+                Log.v("NADA", "Ninguna opcion seleccionada");
+                break;
+
+            case R.id.rbtPlato:
+                /**Cargar el listView con los platos de comida*/
+                Log.v("PLATO", "opcion seleccionada: PLATO");
+                imprimirListaItems("PLATO", listaPlatos);
+
+                adaptador = new ArrayAdapter<ElementoMenu>(this, android.R.layout.simple_list_item_multiple_choice, listaPlatos);
+                listaMenu.setAdapter(adaptador);
+                break;
+
+            case R.id.rbtBebida:
+                /**Cargar el ListView con las Bebidas*/
+                Log.v("BEBIDA", "opcion seleccionada: BEBIDA");
+
+                adaptador = new ArrayAdapter<ElementoMenu>(this, android.R.layout.simple_list_item_multiple_choice, listaBebidas);
+                listaMenu.setAdapter(adaptador);
+                imprimirListaItems("BEBIDA", listaBebidas);
+                break;
+
+            case R.id.rbtPostre:
+                /**Cargar el ListView con las Bebidas*/
+                Log.v("POSTRE", "opcion seleccionada: POSTRE");
+
+                adaptador = new ArrayAdapter<ElementoMenu>(this, android.R.layout.simple_list_item_multiple_choice, listaPostres);
+                listaMenu.setAdapter(adaptador);
+                imprimirListaItems("POSTRE", listaPostres);
+                break;
+        }
+    }
+
+    private void imprimirListaItems(String categoriaItem, ElementoMenu[] listaItems) {
+        for (ElementoMenu item : listaItems) {
+            Log.v(item.getId().toString(), categoriaItem + ": " + item.getNombre() + " | Precio: " + item.getPrecio());
+        }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//        int count = listaMenu.getCount();
+//        SparseBooleanArray viewItems = listaMenu.getCheckedItemPositions();
+//
+//        for (int i = 0; i < count; i++) {
+//            if (viewItems.get(i)) {
+//                ElementoMenu item = (ElementoMenu) listaMenu.getItemAtPosition(i);
+//                Toast.makeText(getApplicationContext(), item + "..." + position, Toast.LENGTH_LONG).show();
+//
+//                if (!elementosPedidos.contains(item)) {
+//                    elementosPedidos.add(String.valueOf(item));
+//                }
+//            }
+//        }
+
+//        for (int i = 0; i < count; i++) {
+//            if (viewItems.get(i)) {
+//                listaMenu.dispatchSetSelected(false);
+//            }
+//        }
+
+
+//        ElementoMenu item = (ElementoMenu) listaMenu.getItemAtPosition(position);
+//        Toast.makeText(getApplicationContext(), item+"..."+ position, Toast.LENGTH_LONG).show();
+//        elementosPedidos.add(item.getNombre()+" ("+item.getPrecio()+")");
+//
+////        /**Esto podria ir en la logica del boton confirmar si se
+////         * quisiera agregar todos los pedidos de una vez al textView*/
+//        tvDatosPedido.setText("");
+//        for(String e: elementosPedidos){
+//            tvDatosPedido.append(e+"\n");
+//        }
+//        tvDatosPedido.setText(item.getNombre());
+    }
+
+//    @Override
+//    public void onClick(View v) {
+//
+//
+//        /**Accion del Boton Confirmar Pedido*/
+//        if (btnConfirmar.isClickable()) {
+//            Toast.makeText(getApplicationContext(), "Logica en construccion", Toast.LENGTH_LONG).show();
+//        }
+//        /**Accion del Boton Reiniciar*/
+//        if (btnReiniciar.isClickable()) {
+//            elementosPedidos.clear();
+//            tvDatosPedido.setText("");
+//            Toast.makeText(getApplicationContext(), "Pedido Reiniciado", Toast.LENGTH_LONG).show();
+//        }
+//    }
+
+    double calcularCostoPedido(ArrayList<ElementoMenu> listaPedido) {
+        double costoPedido = 0.00;
+        for (ElementoMenu item : listaPedido) {
+            costoPedido += item.precio;
+        }
+        return costoPedido;
     }
 
 
@@ -60,24 +298,24 @@ public class MainActivity extends AppCompatActivity {
         listaPlatos[10] = new ElementoMenu(11, "Picada 1");
         listaPlatos[11] = new ElementoMenu(12, "Picada 2");
         listaPlatos[12] = new ElementoMenu(13, "Hamburguesa");
-        listaPlatos[12] = new ElementoMenu(14, "Calamares");
+        listaPlatos[13] = new ElementoMenu(14, "Calamares");
 // inicia lista de postres
-        listaPostre = new ElementoMenu[15];
-        listaPostre[0] = new ElementoMenu(1, "Helado");
-        listaPostre[1] = new ElementoMenu(2, "Ensalada de Frutas");
-        listaPostre[2] = new ElementoMenu(3, "Macedonia");
-        listaPostre[3] = new ElementoMenu(4, "Brownie");
-        listaPostre[4] = new ElementoMenu(5, "Cheescake");
-        listaPostre[5] = new ElementoMenu(6, "Tiramisu");
-        listaPostre[6] = new ElementoMenu(7, "Mousse");
-        listaPostre[7] = new ElementoMenu(8, "Fondue");
-        listaPostre[8] = new ElementoMenu(9, "Profiterol");
-        listaPostre[9] = new ElementoMenu(10, "Selva Negra");
-        listaPostre[10] = new ElementoMenu(11, "Lemon Pie");
-        listaPostre[11] = new ElementoMenu(12, "KitKat");
-        listaPostre[12] = new ElementoMenu(13, "IceCreamSandwich");
-        listaPostre[13] = new ElementoMenu(14, "Frozen Yougurth");
-        listaPostre[14] = new ElementoMenu(15, "Queso y Batata");
+        listaPostres = new ElementoMenu[15];
+        listaPostres[0] = new ElementoMenu(1, "Helado");
+        listaPostres[1] = new ElementoMenu(2, "Ensalada de Frutas");
+        listaPostres[2] = new ElementoMenu(3, "Macedonia");
+        listaPostres[3] = new ElementoMenu(4, "Brownie");
+        listaPostres[4] = new ElementoMenu(5, "Cheescake");
+        listaPostres[5] = new ElementoMenu(6, "Tiramisu");
+        listaPostres[6] = new ElementoMenu(7, "Mousse");
+        listaPostres[7] = new ElementoMenu(8, "Fondue");
+        listaPostres[8] = new ElementoMenu(9, "Profiterol");
+        listaPostres[9] = new ElementoMenu(10, "Selva Negra");
+        listaPostres[10] = new ElementoMenu(11, "Lemon Pie");
+        listaPostres[11] = new ElementoMenu(12, "KitKat");
+        listaPostres[12] = new ElementoMenu(13, "IceCreamSandwich");
+        listaPostres[13] = new ElementoMenu(14, "Frozen Yougurth");
+        listaPostres[14] = new ElementoMenu(15, "Queso y Batata");
     }
 
 
@@ -130,6 +368,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public String toString() {
             return this.nombre + "( " + f.format(this.precio) + ")";
+        }
+    }
+
+    class ItemPedido {
+        private int cantidad;
+        ElementoMenu item;
+
+        public ItemPedido(ElementoMenu item, int cantidad) {
+            this.cantidad = cantidad;
+            this.item = item;
         }
     }
 }

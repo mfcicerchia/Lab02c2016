@@ -12,7 +12,8 @@
 
 
     <!--String de Botones-->
-    <string name="btnDelivery">DELIVERY</string>
+    <string name="btnDeliveryEstado1">DELIVERY</string>
+    <string name="btnDeliveryEstado2">RESERVAR MESA</string>
     <string name="btnAgregar">AGREGAR</string>
     <string name="btnConfirmar">CONFIRMAR PEDIDO</string>
     <string name="btnReiniciar">REINICIAR</string>

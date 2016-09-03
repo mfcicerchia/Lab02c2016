@@ -20,11 +20,14 @@
         android:textStyle="bold"
         android:textColor="#000000" />
 
-    <Button
+    <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/btnDelivery"
-        android:id="@+id/btnDelivery" />
+        android:text="@string/btnDeliveryEstado1"
+        android:id="@+id/btnDelivery"
+        android:checked="false"
+        android:textOff="@string/btnDeliveryEstado2"
+        android:textOn="@string/btnDeliveryEstado1" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -57,17 +60,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Datos del Pedido"
+        android:minLines="1"
+        android:maxLines="5"
         android:id="@+id/tvDatosPedido" />
 
     <RadioGroup
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/radGrp"
         android:orientation="horizontal">
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/rbtPlato"
+            android:tag="@string/rbtPlato"
             android:id="@+id/rbtPlato"
             android:layout_gravity="right" />
 
@@ -75,6 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/rbtPostre"
+            android:tag="@string/rbtPostre"
             android:id="@+id/rbtPostre"
             android:layout_gravity="center_horizontal" />
 
@@ -82,6 +91,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/rbtBebida"
+            android:tag="@string/rbtBebida"
             android:id="@+id/rbtBebida" />
     </RadioGroup>
 
