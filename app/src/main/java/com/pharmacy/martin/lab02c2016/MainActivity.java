@@ -1,6 +1,7 @@
 package com.pharmacy.martin.lab02c2016;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
 import android.icu.text.DecimalFormat;
 import android.nfc.Tag;
 import android.support.annotation.Nullable;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private double costo = 0;
     private boolean pedidoConfirmado = false;
 
-    ArrayList<ElementoMenu> elementosPedidos = new ArrayList<ElementoMenu>();
+    ArrayList<ItemPedido> elementosPedidos = new ArrayList<ItemPedido>();
     ArrayAdapter<ElementoMenu> adaptador;
     ArrayAdapter<String> adaptador2;
 
@@ -117,20 +118,24 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                             ElementoMenu item = (ElementoMenu) listaMenu.getItemAtPosition(i);
                             Toast.makeText(getApplicationContext(), item + "..." + item.getPrecio(), Toast.LENGTH_SHORT).show();
 
-                            elementosPedidos.add(item);
+//                            elementosPedidos.add(item);
                             /**Controlar la cantidad de cada item*/
-                        /* if (!elementosPedidos.contains(item)) {
-                            elementosPedidos.add(item);
-                        }else{
-
-                        }*/
+                            if (!pertenece(elementosPedidos,item)) {
+                                elementosPedidos.add(new ItemPedido(item, 1));
+                            } else {
+                                for (ItemPedido e : elementosPedidos) {
+                                    if (e.item.equals(item)) {
+                                        e.incrementarCantidad();
+                                    }
+                                }
+                            }
                         }
                     }
 
                     if (elementosPedidos != null) {
                         tvDatosPedido.setText("");
-                        for (ElementoMenu e : elementosPedidos) {
-                            tvDatosPedido.append(e + "\n");
+                        for (ItemPedido e : elementosPedidos) {
+                            tvDatosPedido.append(e.item.getNombre()+"("+ e.getCantidadItem()+")" + "\n");
                         }
 
                     } else {
@@ -290,12 +295,21 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 //        }
 //    }
 
-    double calcularCostoPedido(ArrayList<ElementoMenu> listaPedido) {
+    double calcularCostoPedido(ArrayList<ItemPedido> listaPedido) {
         double costoPedido = 0.00;
-        for (ElementoMenu item : listaPedido) {
-            costoPedido += item.precio;
+        for (ItemPedido producto : listaPedido) {
+            costoPedido += producto.item.getPrecio()*(producto.getCantidadItem());
         }
         return costoPedido;
+    }
+
+    public boolean pertenece(ArrayList<ItemPedido> listaPedido, ElementoMenu item){
+        for(ItemPedido pro: listaPedido){
+            if(item.getNombre().equals(pro.item.getNombre())){
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -404,6 +418,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         public ItemPedido(ElementoMenu item, int cantidad) {
             this.cantidad = cantidad;
             this.item = item;
+        }
+
+        public void incrementarCantidad(){
+            this.cantidad+=1;
+        }
+
+        public int getCantidadItem(){
+            return this.cantidad;
         }
     }
 }
