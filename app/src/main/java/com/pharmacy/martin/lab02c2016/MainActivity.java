@@ -23,7 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.prefs.Preferences;
 
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     ArrayList<ElementoMenu> elementosPedidos = new ArrayList<ElementoMenu>();
     ArrayAdapter<ElementoMenu> adaptador;
+    ArrayAdapter<String> adaptador2;
 
 
     /**
@@ -79,6 +82,26 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         tvDatosPedido = (TextView) findViewById(R.id.tvDatosPedido);
         tvDatosPedido.setMovementMethod(new ScrollingMovementMethod());
+
+
+        spnrHorario = (Spinner) findViewById(R.id.spnrHorarios);
+        final String[] horarios = new String[] {"20:00","20:30","21:00","21:30","22:00","22:30","23:00"};
+        ArrayList<String> arrayListHorarios = new ArrayList<String>(Arrays.asList(horarios));
+        adaptador2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListHorarios);
+        adaptador2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spnrHorario.setAdapter(adaptador2);
+        spnrHorario.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
 
         /**Asignacion del manejador de evento a cada boton (otra forma)*/
@@ -133,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     } else {
                         Toast.makeText(getApplicationContext(), "Debe seleccionar algun producto del Menu", Toast.LENGTH_LONG).show();
                     }
-                }else{
+                } else {
                     Toast.makeText(getApplicationContext(), "Pedido ya confirmado con Exito", Toast.LENGTH_LONG).show();
                 }
 
@@ -148,12 +171,15 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 elementosPedidos.clear();
                 ArrayList<ElementoMenu> elementosPedidos = new ArrayList<ElementoMenu>();
                 tvDatosPedido.setText("Datos de Pedido");
-                pedidoConfirmado=false;
+                pedidoConfirmado = false;
             }
         });
 
 
+
     }
+
+
 
 
     /**
