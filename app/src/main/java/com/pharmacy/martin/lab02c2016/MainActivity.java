@@ -57,12 +57,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private ElementoMenu[] listaPlatos;
     private ElementoMenu[] listaPostres;
 
-    /**
-     * definicion de Decimal format
-     */
 
-
-    private String TAG;
 
 
     @Override
@@ -118,9 +113,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                             ElementoMenu item = (ElementoMenu) listaMenu.getItemAtPosition(i);
                             Toast.makeText(getApplicationContext(), item + "..." + item.getPrecio(), Toast.LENGTH_SHORT).show();
 
-//                            elementosPedidos.add(item);
                             /**Controlar la cantidad de cada item*/
-                            if (!pertenece(elementosPedidos,item)) {
+                            if (!pertenece(elementosPedidos, item)) {
                                 elementosPedidos.add(new ItemPedido(item, 1));
                             } else {
                                 for (ItemPedido e : elementosPedidos) {
@@ -135,14 +129,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     if (elementosPedidos != null) {
                         tvDatosPedido.setText("");
                         for (ItemPedido e : elementosPedidos) {
-                            tvDatosPedido.append(e.item.getNombre()+"("+ e.getCantidadItem()+")" + "\n");
+                            tvDatosPedido.append(e.item.getNombre()+"("+e.getCantidadItem()+")"+"-> $ "+e.item.getPrecio()*e.getCantidadItem()+"\n");
                         }
-
                     } else {
                         Toast.makeText(getApplicationContext(), "Debe seleccionar elementos del Menu", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "No puede agregar productos al pedido porque fue confirmado", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "No puede agregar productos al pedido porque fue confirmado", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -155,14 +148,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 double costo = calcularCostoPedido(elementosPedidos);
                 if (pedidoConfirmado != true) {
                     if (costo != 0) {
-                        tvDatosPedido.append("El costro del pedido es: " + costo);
-                        Toast.makeText(getApplicationContext(), "El costo del pedidos es: " + costo, Toast.LENGTH_LONG).show();
+                        tvDatosPedido.append("El costo del pedido es: $" + costo);
+                        Toast.makeText(getApplicationContext(), "El costo del pedidos es: $" + costo, Toast.LENGTH_SHORT).show();
                         pedidoConfirmado = true;
                     } else {
-                        Toast.makeText(getApplicationContext(), "Debe seleccionar algun producto del Menu", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Debe seleccionar algun producto del Menu", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "Pedido ya confirmado con Exito", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Pedido ya confirmado con Exito", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -179,9 +172,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 pedidoConfirmado = false;
             }
         });
-
-
-
     }
 
 
