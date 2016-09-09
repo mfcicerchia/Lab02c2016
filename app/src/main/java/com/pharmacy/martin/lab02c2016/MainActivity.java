@@ -2,7 +2,6 @@ package com.pharmacy.martin.lab02c2016;
 
 import android.annotation.SuppressLint;
 import android.content.ClipData;
-import android.icu.text.DecimalFormat;
 import android.nfc.Tag;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +24,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.lang.reflect.Array;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     for (int i = 0; i < count; i++) {
                         if (viewItems.get(i)) {
                             ElementoMenu item = (ElementoMenu) listaMenu.getItemAtPosition(i);
-                            Toast.makeText(getApplicationContext(), item + "..." + item.getPrecio(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), item + "..." + f.format(item.getPrecio()).toString(), Toast.LENGTH_SHORT).show();
 
                             /**Controlar la cantidad de cada item*/
                             if (!pertenece(elementosPedidos, item)) {
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     if (elementosPedidos != null) {
                         tvDatosPedido.setText("");
                         for (ItemPedido e : elementosPedidos) {
-                            tvDatosPedido.append(e.item.getNombre()+"("+e.getCantidadItem()+")"+"-> $ "+e.item.getPrecio()*e.getCantidadItem()+"\n");
+                            tvDatosPedido.append(e.item.getNombre()+"("+e.getCantidadItem()+")"+"-> $ "+ f.format(e.item.getPrecio() * e.getCantidadItem()) +"\n");
                         }
                     } else {
                         Toast.makeText(getApplicationContext(), "Debe seleccionar elementos del Menu", Toast.LENGTH_SHORT).show();
@@ -148,8 +148,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 double costo = calcularCostoPedido(elementosPedidos);
                 if (pedidoConfirmado != true) {
                     if (costo != 0) {
-                        tvDatosPedido.append("El costo del pedido es: $" + costo);
-                        Toast.makeText(getApplicationContext(), "El costo del pedidos es: $" + costo, Toast.LENGTH_SHORT).show();
+                        tvDatosPedido.append("El costo del pedido es: $" + f.format(costo).toString());
+                        Toast.makeText(getApplicationContext(), "El costo del pedidos es: $" + f.format(costo).toString(), Toast.LENGTH_SHORT).show();
                         pedidoConfirmado = true;
                     } else {
                         Toast.makeText(getApplicationContext(), "Debe seleccionar algun producto del Menu", Toast.LENGTH_SHORT).show();
@@ -290,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         for (ItemPedido producto : listaPedido) {
             costoPedido += producto.item.getPrecio()*(producto.getCantidadItem());
         }
+
         return costoPedido;
     }
 
@@ -350,7 +351,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
 
     DecimalFormat f = new DecimalFormat("##.00");
-
     class ElementoMenu {
         private Integer id;
         private String nombre;
